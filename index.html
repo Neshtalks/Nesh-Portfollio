@@ -11,6 +11,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Dinesh K. AI/ML">
     <link rel="apple-touch-icon" href="images/icon-192x192.png">
+    <!-- Placeholder for your resume PDF - create a 'resume' folder and add your PDF -->
+    <!-- Example: <link rel="prefetch" href="resume/Dinesh_Krishnamoorthy_Resume.pdf" as="fetch" crossOrigin="anonymous"> -->
 </head>
 <body>
     <canvas id="bg-canvas"></canvas>
@@ -46,6 +48,7 @@
                 </div>
                 <div class="hero-cta">
                     <a href="#projects" class="cta-button primary-cta">Explore Innovations (Π)</a>
+                    <a href="resume/Dinesh_Krishnamoorthy_Resume.pdf" download="Dinesh_Krishnamoorthy_Resume.pdf" class="cta-button resume-cta">Download Resume (📄)</a>
                     <a href="#contact" class="cta-button secondary-cta">Get In Touch (∇)</a>
                 </div>
             </div>
@@ -66,7 +69,7 @@
         <section id="experience" class="scroll-animate">
             <div class="container">
                 <h2>∑ Professional Experience: Architecting Impact</h2>
-                <div class="experience-layout"> <!-- Re-using "floating card" structure from before -->
+                <div class="experience-layout">
                     <div class="experience-card-float scroll-animate-child">
                         <h3 class="exp-role">E-commerce Operation Manager & ML Lead</h3>
                         <p class="exp-company">UAC S.A.R.L <span class="exp-location">| Kinshasa, DR Congo</span></p>
@@ -120,7 +123,7 @@
                 <p class="section-subtitle">My academic journey and early career internships laid the groundwork for specialized expertise.</p>
                 <div class="career-path-timeline">
                     <div class="career-path-item education scroll-animate-child">
-                        <div class="item-icon">🎓</div> <!-- Using emoji for fun accent -->
+                        <div class="item-icon">🎓</div>
                         <div class="item-content">
                             <h3>M.Sc in Mathematics</h3>
                             <p class="item-subtitle">Madras University (Mohammed Sathak A&S College)</p>
@@ -138,7 +141,7 @@
                         </div>
                     </div>
                     <div class="career-path-item internship scroll-animate-child">
-                        <div class="item-icon">💡</div>
+                        <div class="item-icon">🔬</div>
                         <div class="item-content">
                             <h3>Internship: Deep Learning in NLP</h3>
                             <p class="item-subtitle">MSME-TDC (PPDC), Agra (Feb 2025)</p>
@@ -146,7 +149,7 @@
                         </div>
                     </div>
                      <div class="career-path-item internship scroll-animate-child">
-                        <div class="item-icon">💡</div>
+                        <div class="item-icon">🚀</div>
                         <div class="item-content">
                             <h3>Internship: Full Stack ML Engineer</h3>
                             <p class="item-subtitle">MSME-TDC (PPDC), Agra (July 2024)</p>
@@ -154,7 +157,7 @@
                         </div>
                     </div>
                     <div class="career-path-item internship scroll-animate-child">
-                        <div class="item-icon">💡</div>
+                        <div class="item-icon">📊</div>
                         <div class="item-content">
                             <h3>Internship: Business Analytics</h3>
                             <p class="item-subtitle">MSME-TDC (PPDC), Agra (Oct 2024)</p>
@@ -312,13 +315,15 @@
     <footer class="site-footer">
         <div class="container footer-container">
             <div class="footer-top-row">
-                <div class="footer-logo-final">DK</div>
+                <div class="footer-logo-final">
+                    <a href="#home" title="Back to Top">DK</a>
+                </div>
                 <nav class="footer-navigation">
                     <a href="#home">Home</a>
                     <a href="#about">About</a>
                     <a href="#experience">Experience</a>
                     <a href="#projects">Projects</a>
-                    <a href="#contact">Contact</a>
+                    <a href="resume/Dinesh_Krishnamoorthy_Resume.pdf" download="Dinesh_Krishnamoorthy_Resume.pdf" title="Download Resume">Resume</a>                    <a href="#contact">Contact</a>
                 </nav>
                 <div class="footer-social-icons-final">
                      <a href="https://linkedin.com/in/YOUR_LINKEDIN_PROFILE" target="_blank" title="LinkedIn">LI</a>
@@ -328,6 +333,7 @@
             </div>
             <div class="footer-bottom-row">
                 <p class="copyright-text">© <span id="currentYear"></span> Dinesh Krishnamoorthy. Algorithms & Artistry in Code.</p>
+                <p class="footer-credits">Built with <span class="heart-icon">❤</span> and a sprinkle of <span class="math-icon">∫∑∀</span></p>
             </div>
         </div>
     </footer>
@@ -342,5 +348,6 @@
             });
         }
     </script>
+    
 </body>
 </html>

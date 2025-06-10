@@ -1,0 +1,5 @@
+# Add common ignores if needed, e.g.:
+# node_modules/
+# .DS_Store
+# *.log
+# .env

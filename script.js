@@ -1,21 +1,24 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Smooth Scrolling & Active Nav Link
-    document.querySelectorAll('nav a[href^="#"]').forEach(anchor => {
+    document.querySelectorAll('nav a[href^="#"], .footer-navigation a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const targetId = this.getAttribute('href');
-            const targetElement = document.querySelector(targetId);
-            if (targetElement) {
-                const headerOffset = document.querySelector('header')?.offsetHeight || 70;
-                const elementPosition = targetElement.getBoundingClientRect().top + window.pageYOffset;
-                const offsetPosition = elementPosition - headerOffset;
-                window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
-            }
-            document.querySelectorAll('nav a').forEach(link => link.classList.remove('active'));
-            this.classList.add('active');
-            const navLinks = document.getElementById('navLinks');
-            if (navLinks.classList.contains('active')) {
-                navLinks.classList.remove('active');
+            const href = this.getAttribute('href');
+            if (href.startsWith('#')) {
+                e.preventDefault();
+                const targetElement = document.querySelector(href);
+                if (targetElement) {
+                    const headerOffset = document.querySelector('header')?.offsetHeight || 70;
+                    const elementPosition = targetElement.getBoundingClientRect().top + window.pageYOffset;
+                    const offsetPosition = elementPosition - headerOffset;
+                    window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+                }
+                document.querySelectorAll('nav a, .footer-navigation a').forEach(link => link.classList.remove('active'));
+                this.classList.add('active'); // Active class for nav, might need specific handling for footer if desired
+                
+                const navLinks = document.getElementById('navLinks');
+                if (navLinks && navLinks.classList.contains('active')) { // Close mobile menu on item click
+                    navLinks.classList.remove('active');
+                }
             }
         });
     });
@@ -37,139 +40,182 @@ document.addEventListener('DOMContentLoaded', () => {
     if (contactForm) {
         contactForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            console.log("Form Submitted:", Object.fromEntries(new FormData(this)));
-            alert("Thank you! Your message has been sent. (This is a demo)");
+            const name = this.elements.name.value;
+            const email = this.elements.email.value;
+            const message = this.elements.message.value;
+            if (!name || !email || !message) {
+                alert("Please fill in all fields.");
+                return;
+            }
+            console.log("Form Submitted:", { name, email, message });
+            // Replace with actual form submission logic (e.g., Formspree, Netlify Forms, or a backend)
+            alert("Thank you! Your message has been sent. (This is a demo and does not actually send emails).");
             this.reset();
         });
     }
 
-    // Canvas Floating Symbols Animation - REFINED
+    // Canvas Floating Symbols Animation - REFINED FOR SLOW FADE & 5-SEC LIFESPAN
     const canvas = document.getElementById('bg-canvas');
     if (canvas) {
+        console.log("Canvas element 'bg-canvas' found."); // DEBUG
         const ctx = canvas.getContext('2d');
+        if (!ctx) {
+            console.error("Failed to get 2D context for canvas."); // DEBUG
+            return; // Stop if no context
+        }
+        console.log("Canvas 2D context obtained."); // DEBUG
+
         let animationFrameId;
-        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        function resizeCanvas() { 
+            canvas.width = window.innerWidth; 
+            canvas.height = window.innerHeight; 
+            console.log("Canvas resized to: " + canvas.width + "x" + canvas.height); // DEBUG
+        }
         window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
+        resizeCanvas(); // Initial resize
 
         let symbols = [];
-        const accentColorsRGB = [ // In order of var(--primary-accent) then "fun" accents
-            '0, 127, 255',   // Electric Blue
+        const accentColorsRGB = [
+            '0, 127, 255',   // Electric Blue (Primary Accent for ambient)
             '255, 0, 255',    // Magenta
             '50, 205, 50',    // Lime Green
             '255, 165, 0',    // Bright Orange
             '0, 255, 255'     // Bright Cyan
         ];
-        const mathSymbols = ['∫','∑','∏','∂','∇','Δ','∈','∀','∃','∴','∵','≅','≈','≠','≤','≥','⊂','⊃','∩','∪','α','β','γ','δ','ε','ζ','η','θ','ι','κ','λ','μ','ν','ξ','ο','π','ρ','σ','τ','υ','φ','χ','ψ','ω','X̄','σ²','μₓ','P(A|B)','∇J(θ)','argmax','log(x)','exp(x)','lim','det(A)','Tr(M)','||v||','ƒ(x)','E[X]','Var(X)','ReLU','Sigmoid','0','1','e','i','∞','ℏ','∇²','∮'];
-        
+        const mathSymbols = ['∫','∬','∭','∮','∑','∏','∂','∇','Δ','∈','∉','∀','∃','∴','∵','≅','≈','≠','≤','≥','⊂','⊃','⊆','⊇','∩','∪','∅','ℝ','ℚ','ℤ','ℕ','ℂ','ħ','ℏ','γ','λ','μ','ν','ξ','ο','π','ρ','σ','τ','υ','φ','χ','ψ','ω','Α','Β','Γ','Δ','Ε','Ζ','Η','Θ','Ι','Κ','Λ','Μ','Ν','Ξ','Ο','Π','Ρ','Σ','Τ','Υ','Φ','Χ','Ψ','Ω','X̄','σ²','μₓ','P(A)','P(A|B)','E[X]','Var(X)','Cov(X,Y)','H','∇²','∇J(θ)','argmin','argmax','log','ln','exp','sin','cos','tan','lim','→','↦','⇔','⇒','d/dx','ƒ(x)','||v||','det(A)','Tr(M)','diag(v)','ReLU','σ(x)','tanh(x)','softmax','0','1','e','i','∞','⊕','⊗','⊙','⊥','∥','∠','∧','∨','¬','∃!','□','◊'];
+
         function getRandomChar() { return mathSymbols[Math.floor(Math.random() * mathSymbols.length)]; }
-        function getRandomFunColorRgb() { return accentColorsRGB[Math.floor(Math.random() * (accentColorsRGB.length -1))+1]; }
+        function getRandomFunColorRgb() { return accentColorsRGB[Math.floor(Math.random() * (accentColorsRGB.length - 1)) + 1]; }
         function getPrimaryColorRgb() { return accentColorsRGB[0]; }
 
-        function createSymbol(properties) {
-            const defaults = {
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
+        const PARTICLE_LIFESPAN_FRAMES_MIN = 280; // Approx 4.6 seconds at 60fps
+        const PARTICLE_LIFESPAN_FRAMES_VAR = 40;  // Variation
+
+        function createSymbol(isBurst = false, clickX, clickY) {
+            const life = PARTICLE_LIFESPAN_FRAMES_MIN + Math.random() * PARTICLE_LIFESPAN_FRAMES_VAR;
+            let initialOpacity, colorRgb, size, speedX, speedY, rotation;
+
+            if (isBurst) {
+                initialOpacity = 0.55 + Math.random() * 0.2;
+                colorRgb = getRandomFunColorRgb();
+                size = (Math.random() < 0.6 ? Math.random() * 4 + 6 : Math.random() * 5 + 10);
+                speedX = (Math.random() - 0.5) * 0.8;
+                speedY = (Math.random() - 0.5) * 0.8;
+                rotation = (Math.random() - 0.5) * 0.005; 
+            } else { // Ambient particle
+                initialOpacity = 0.06 + Math.random() * 0.08;
+                colorRgb = getPrimaryColorRgb();
+                size = (Math.random() < 0.9 ? Math.random() * 1.5 + 2 : Math.random() * 2.5 + 4);
+                speedX = (Math.random() - 0.5) * 0.06;
+                speedY = (Math.random() * -0.05) - 0.005;
+                rotation = (Math.random() - 0.5) * 0.002;
+            }
+
+            symbols.push({
+                x: isBurst ? clickX : Math.random() * canvas.width,
+                y: isBurst ? clickY : Math.random() * canvas.height,
                 char: getRandomChar(),
-                size: (Math.random() < 0.7 ? Math.random()*5+4 : (Math.random() < 0.94 ? Math.random()*4+9 : Math.random()*5+14)), // Generally smaller
-                speedX: (Math.random() - 0.5) * 0.3, 
-                speedY: (Math.random() * -0.20) - 0.01, 
-                opacity: 0.005 + Math.random() * 0.15, 
-                targetOpacity: 0.03 + Math.random() * 0.25, 
-                colorRgb: getPrimaryColorRgb(), 
-                rotation: (Math.random() - 0.5) * 0.007,
+                size: size,
+                speedX: speedX,
+                speedY: speedY,
+                initialOpacity: initialOpacity,
+                opacity: initialOpacity,
+                colorRgb: colorRgb,
+                rotation: rotation,
                 angle: Math.random() * Math.PI * 2,
-                fadeSpeed: 0.001 + Math.random() * 0.001,
-                life: Infinity 
-            };
-            symbols.push({ ...defaults, ...properties });
+                life: life,
+                fadeSpeed: initialOpacity / life
+            });
+        }
+
+        const targetParticleDensity = 0.000035;
+        let targetAmbientParticles = Math.max(12, Math.min(40, Math.floor(canvas.width * canvas.height * targetParticleDensity)));
+
+        function maintainAmbientParticles() {
+            symbols = symbols.filter(s => s.life > 0 && s.opacity > 0);
+            while (symbols.length < targetAmbientParticles) {
+                createSymbol(false); 
+            }
         }
         
-        const targetParticleDensity = 0.00005; // Further reduced for subtlety
-        let targetAmbientParticles = Math.max(12, Math.min(50, Math.floor(canvas.width * canvas.height * targetParticleDensity)));
-
-        function populateInitialAmbientParticles() {
-            symbols = symbols.filter(s => s.life !== Infinity); // Keep click bursts if any
-            const currentAmbientCount = symbols.filter(s => s.life === Infinity).length;
-            for(let i = currentAmbientCount; i < targetAmbientParticles ; i++) createSymbol({});
+        // Initial population
+        console.log("Populating initial ambient particles. Target: " + targetAmbientParticles); // DEBUG
+        for(let i = 0; i < targetAmbientParticles; i++) {
+            createSymbol(false);
         }
-        populateInitialAmbientParticles();
+        console.log("Initial symbols count: " + symbols.length); // DEBUG
+
+
         window.addEventListener('resize', () => {
-            targetAmbientParticles = Math.max(12, Math.min(50, Math.floor(canvas.width * canvas.height * targetParticleDensity)));
-            populateInitialAmbientParticles(); // Repopulate ambient particles maintaining bursts
+            // resizeCanvas() is already called by its own listener
+            targetAmbientParticles = Math.max(12, Math.min(40, Math.floor(canvas.width * canvas.height * targetParticleDensity)));
+            // maintainAmbientParticles(); // Let the animation loop handle maintenance
         });
 
-        // Click interaction - ENSURED AND REFINED
-        document.body.addEventListener('click', (event) => { // Listen on body for general clicks
-            if (event.target.closest('a, button, input, textarea, .menu-toggle')) {
-                return; // Don't trigger on specific interactive elements
+        document.body.addEventListener('click', (event) => {
+            if (event.target.closest('a, button, input, textarea, .menu-toggle, label')) {
+                return;
             }
-            const burstCount = 6 + Math.floor(Math.random() * 5);
+            const burstCount = 4 + Math.floor(Math.random() * 3);
+            console.log("Click burst. Count: " + burstCount); //DEBUG
             for (let i = 0; i < burstCount; i++) {
-                createSymbol({
-                    x: event.clientX,
-                    y: event.clientY,
-                    speedX: (Math.random() - 0.5) * 3, 
-                    speedY: (Math.random() - 0.5) * 3,
-                    opacity: 0.75 + Math.random() * 0.25, 
-                    targetOpacity: 0, 
-                    colorRgb: getRandomFunColorRgb(), 
-                    fadeSpeed: 0.02 + Math.random() * 0.01, 
-                    life: 45 + Math.random() * 25, // Shorter, more impactful burst life
-                    size: (Math.random() < 0.5 ? Math.random()*6+8 : Math.random()*7+14) // Click burst particles can be slightly larger
-                });
+                createSymbol(true, event.clientX, event.clientY); 
             }
         });
 
-        let lastAmbientParticleAddTime = 0;
-        const ambientParticleAddInterval = 350;
+        let lastParticleMaintenanceTime = 0;
+        const particleMaintenanceInterval = 100; 
 
         function animateParticles(currentTime) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            const currentAmbientCount = symbols.filter(s => s.life === Infinity).length;
 
-            if (currentTime - lastAmbientParticleAddTime > ambientParticleAddInterval && currentAmbientCount < targetAmbientParticles) {
-                const edge = Math.floor(Math.random() * 4);
-                let x,y,sX=0,sY=0; const off = 30;
-                if(edge===0){x=Math.random()*canvas.width;y=canvas.height+off;sY=-(0.01+Math.random()*0.08);}
-                else if(edge===1){x=canvas.width+off;y=Math.random()*canvas.height;sX=-(0.01+Math.random()*0.08);}
-                else if(edge===2){x=Math.random()*canvas.width;y=-off;sY=(0.01+Math.random()*0.08);}
-                else{x=-off;y=Math.random()*canvas.height;sX=(0.01+Math.random()*0.08);}
-                createSymbol({x,y,speedX:sX,speedY:sY,opacity:0.001});
-                lastAmbientParticleAddTime = currentTime;
+            if (currentTime - lastParticleMaintenanceTime > particleMaintenanceInterval) {
+                maintainAmbientParticles();
+                lastParticleMaintenanceTime = currentTime;
             }
+
+            if (symbols.length === 0 && targetAmbientParticles > 0) { // DEBUG check if symbols array is unexpectedly empty
+                // console.warn("Symbols array is empty during animation, but target is > 0. Attempting to repopulate.");
+                // maintainAmbientParticles(); // Try to repopulate if it got emptied somehow
+            }
+
 
             for (let i = 0; i < symbols.length; i++) {
                 const s = symbols[i];
-                ctx.save(); ctx.translate(s.x, s.y); s.angle += s.rotation; ctx.rotate(s.angle);
-                ctx.font = `bold ${s.size}px var(--font-mono, 'Courier New', monospace)`; 
-                
-                if (s.life === Infinity && s.opacity < s.targetOpacity) s.opacity += s.fadeSpeed;
-                else if (s.life !== Infinity && s.opacity > s.targetOpacity) s.opacity -= s.fadeSpeed; 
+
+                s.opacity -= s.fadeSpeed;
                 if (s.opacity < 0) s.opacity = 0;
 
+                ctx.save();
+                ctx.translate(s.x, s.y);
+                s.angle += s.rotation;
+                ctx.rotate(s.angle);
+                ctx.font = `bold ${s.size}px var(--font-mono, 'Courier New', monospace)`;
+
                 ctx.fillStyle = `rgba(${s.colorRgb}, ${s.opacity})`;
-                ctx.shadowColor = `rgba(${s.colorRgb}, ${s.opacity * 0.35})`; 
-                ctx.shadowBlur = s.size / 3;
-                ctx.fillText(s.char, -ctx.measureText(s.char).width/2, s.size/3);
+                ctx.shadowColor = `rgba(${s.colorRgb}, ${s.opacity * 0.25})`;
+                ctx.shadowBlur = s.size / 4;
+                ctx.fillText(s.char, -ctx.measureText(s.char).width / 2, s.size / 3);
                 ctx.restore();
 
-                s.x += s.speedX; s.y += s.speedY;
-                if (s.life !== Infinity) s.life--;
+                s.x += s.speedX;
+                s.y += s.speedY;
+                s.life--;
 
-                if (s.life <= 0 || s.x < -50 || s.x > canvas.width + 50 || s.y < -50 || s.y > canvas.height + 50) {
-                    symbols.splice(i, 1); i--;
+                if (s.life <= 0 || s.opacity <= 0) { // Simplified removal condition
+                    symbols.splice(i, 1);
+                    i--;
                 }
             }
             animationFrameId = requestAnimationFrame(animateParticles);
         }
+        
+        console.log("Starting particle animation."); // DEBUG
         animationFrameId = requestAnimationFrame(animateParticles);
+
+    } else {
+        console.error("Canvas element with ID 'bg-canvas' NOT FOUND at the time of script execution."); // DEBUG
     }
-
-    // Typed Text Animation for Hero Sub-tagline
-    // (CSS handles this primarily, JS only if more complex logic needed)
-
-    // Skills Carousel - REMOVED as per request for static skills section
 
     // Scroll Animations (IntersectionObserver)
     const scrollElements = document.querySelectorAll(".scroll-animate");
@@ -178,42 +224,46 @@ document.addEventListener('DOMContentLoaded', () => {
         entries.forEach(entry => {
             if (entry.isIntersecting) entry.target.classList.add("visible");
         });
-    }, { threshold: 0.05 }); // Trigger early for subtle effect
+    }, { threshold: 0.05 }); 
     scrollElements.forEach(el => intersectionObserver.observe(el));
     scrollChildren.forEach(el => intersectionObserver.observe(el));
 
     // Active Nav Link on Scroll (IntersectionObserver)
     const sections = document.querySelectorAll("main section");
-    const navLiAnchors = document.querySelectorAll("nav ul li a");
+    const navLiAnchors = document.querySelectorAll("nav ul li a"); 
     const headerHeight = document.querySelector('header')?.offsetHeight || 70;
+
     const navScrollObserver = new IntersectionObserver((entries) => {
-        let lastIntersectingSectionId = null;
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                lastIntersectingSectionId = entry.target.getAttribute('id');
+        let currentActiveSectionId = null;
+        
+        if (window.pageYOffset < window.innerHeight * 0.3) { 
+            currentActiveSectionId = 'home';
+        } else {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    currentActiveSectionId = entry.target.getAttribute('id');
+                }
+            });
+        }
+
+        navLiAnchors.forEach(a => {
+            if (currentActiveSectionId && a.getAttribute('href') === `#${currentActiveSectionId}`) {
+                a.classList.add('active');
+            } else {
+                a.classList.remove('active');
             }
         });
-        
-        if (window.pageYOffset < window.innerHeight * 0.2) { // More sensitive check for top of page
-             lastIntersectingSectionId = 'home';
-        }
+    }, { 
+        rootMargin: `-${headerHeight + 20}px 0px -${window.innerHeight - headerHeight - 150}px 0px`,
+        threshold: 0 
+    });
 
-        if (lastIntersectingSectionId) {
-            navLiAnchors.forEach(a => {
-                a.classList.toggle('active', a.getAttribute('href') === `#${lastIntersectingSectionId}`);
-            });
-        } else if (window.pageYOffset > window.innerHeight * 0.2) { 
-            // If scrolled down but no section is "active" (e.g. in between sections)
-            // remove active class from all to avoid a "sticky" active link
-            // navLiAnchors.forEach(a => a.classList.remove('active'));
-            // Or, try to find the "closest" one above current scroll - more complex
-        }
-
-
-    }, { rootMargin: `-${headerHeight + 40}px 0px -${window.innerHeight - headerHeight - 120}px 0px`}); // Adjusted rootMargin
     sections.forEach(section => navScrollObserver.observe(section));
-    // Initial check for home link
-    if (window.pageYOffset < window.innerHeight * 0.2) {
-        document.querySelector('nav a[href="#home"]')?.classList.add('active');
+    if (window.pageYOffset < window.innerHeight * 0.3) { 
+        const homeLink = document.querySelector('nav a[href="#home"]');
+        if (homeLink) {
+            navLiAnchors.forEach(a => a.classList.remove('active')); 
+            homeLink.classList.add('active');
+        }
     }
 });

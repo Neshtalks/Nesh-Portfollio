@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Test Page</title>
+    <style>
+        body { margin: 0; background-color: #333; } /* Dark background to see canvas */
+        canvas { border: 3px solid limegreen; } /* Visible border for the canvas */
+    </style>
+</head>
+<body>
+
+    <h1>Canvas Test</h1>
+    <p>If this works, a blue rectangle with yellow text "Canvas OK?" should appear below inside a lime green border.</p>
+
+    <canvas id="myTestCanvas" width="300" height="200"></canvas>
+
+    <script>
+        try {
+            console.log('[ULTRA MINIMAL TEST] Script executing.');
+            const canvasElement = document.getElementById('myTestCanvas');
+
+            if (canvasElement) {
+                console.log('[ULTRA MINIMAL TEST] Canvas element #myTestCanvas found.');
+                // Width and height are already set in the HTML, but can be set here too.
+                // canvasElement.width = 300;
+                // canvasElement.height = 200;
+
+                const ctx = canvasElement.getContext('2d');
+                if (ctx) {
+                    console.log('[ULTRA MINIMAL TEST] 2D context obtained.');
+
+                    // Draw a solid blue rectangle
+                    ctx.fillStyle = 'blue';
+                    ctx.fillRect(20, 20, 120, 90); // x, y, width, height
+                    console.log('[ULTRA MINIMAL TEST] Blue rectangle drawn (or attempted).');
+
+                    // Draw some yellow text
+                    ctx.fillStyle = 'yellow';
+                    ctx.font = '24px Arial';
+                    ctx.fillText('Canvas OK?', 25, 65); // text, x, y
+                    console.log('[ULTRA MINIMAL TEST] Yellow text drawn (or attempted).');
+
+                } else {
+                    console.error('[ULTRA MINIMAL TEST] FAILED to get 2D context.');
+                    alert('[ULTRA MINIMAL TEST] FAILED to get 2D context. Check console.');
+                }
+            } else {
+                console.error('[ULTRA MINIMAL TEST] FAILED to find canvas element #myTestCanvas.');
+                alert('[ULTRA MINIMAL TEST] FAILED to find canvas element #myTestCanvas. Check HTML ID and console.');
+            }
+        } catch (e) {
+            console.error('[ULTRA MINIMAL TEST] EXCEPTION:', e);
+            alert('[ULTRA MINIMAL TEST] EXCEPTION OCCURRED: ' + e.message + '. Check console.');
+        }
+    </script>
+
+</body>
+</html>
